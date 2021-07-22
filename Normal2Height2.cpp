@@ -44,8 +44,6 @@ lbfgsfloatval_t evaluate(
     auto const width = normals_.cols;
     auto const height = normals_.rows;
 
-    int residual_idx = 0;
-
     memset(g, 0, sizeof(lbfgsfloatval_t) * width * height);
 
     double fx = 0;
@@ -161,7 +159,9 @@ int main(int argc, char* argv[])
 
     cv::Mat copy;
 
-    normalize(Xat2, copy, 0, 1, cv::NORM_MINMAX);
+    GaussianBlur(Xat2, copy, cv::Size(3, 3), 0, 0);
+
+    normalize(copy, copy, 0, 1, cv::NORM_MINMAX);
 
     lbfgs_free(x);
 
