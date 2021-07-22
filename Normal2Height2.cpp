@@ -8,6 +8,8 @@
 #include <lbfgs.h>
 
 #include <iostream>
+#include <queue>
+
 
 namespace {
 
@@ -76,17 +78,39 @@ lbfgsfloatval_t evaluate(
     return fx;
 };
 
+auto FindThresholdIIntensity(const cv::Mat& dst, double coeff) {
+    std::priority_queue<double> heap;
+    const auto HEAP_SIZE = dst.rows * dst.cols * coeff;
+    for (int y = 0; y < dst.rows; ++y)
+        for (int x = 0; x < dst.cols; ++x) {
+            auto v = dst.at<double>(y, x);
+            if (heap.size() >= HEAP_SIZE) {
+                if (heap.top() <= v) continue;
+                heap.pop();
+            }
+            heap.push(v);
+        }
+
+    return heap.top();
+}
+
+
 }
 
 
 int main(int argc, char* argv[])
 {
-    std::string in_file =
-        argv[1];
+    if (argc < 2)
+    {
+        std::cout << "Usage: Normal2Height2 input_file [output_file]\n";
+        return EXIT_FAILURE;
+    }
+
+    std::string in_file = argv[1];
     if (in_file.empty())
     {
         std::cout << "Couldn't locate " << in_file << std::endl;
-        return 1;
+        return EXIT_FAILURE;
     }
 
     auto in_tex = cv::imread(in_file);
@@ -161,6 +185,8 @@ int main(int argc, char* argv[])
 
     GaussianBlur(Xat2, copy, cv::Size(3, 3), 0, 0);
 
+    copy = cv::max(copy, FindThresholdIIntensity(copy, 0.01));
+
     normalize(copy, copy, 0, 1, cv::NORM_MINMAX);
 
     lbfgs_free(x);
@@ -168,6 +194,13 @@ int main(int argc, char* argv[])
     cv::imshow("result", copy);
 
     cv::waitKey();
+
+    if (argc > 2)
+    {
+        cv::Mat img;
+        copy.convertTo(img, CV_8U, 255);
+        cv::imwrite(argv[2], img);
+    }
 
     return 0;
 }
