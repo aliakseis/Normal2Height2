@@ -57,13 +57,13 @@ lbfgsfloatval_t evaluate(
             auto kx = (x_[y * width + x + 1] - x_[y * width + x - 1]) / 2;
             auto ky = (x_[(y + 1) * width + x] - x_[(y - 1) * width + x]) / 2;
 
-            auto out = normals_.at<cv::Vec3f>(y, x);
+            auto out = normals_.at<cv::Vec2f>(y, x);
 
-            auto kx_wanted = -out[0] / out[2];
-            auto ky_wanted = -out[1] / out[2];
+            //auto kx_wanted = -out[0] / out[2];
+            //auto ky_wanted = -out[1] / out[2];
 
-            auto dkx = kx_wanted - kx;
-            auto dky = ky_wanted - ky;
+            auto dkx = /*kx_wanted*/ out[0] - kx;
+            auto dky = /*ky_wanted*/ out[1] - ky;
 
             fx += dkx * dkx + dky * dky;
 
@@ -131,30 +131,33 @@ int main(int argc, char* argv[])
 
     // generate clean normal map
 
-    cv::Mat normals(in_tex.size(), CV_32FC3);
+    cv::Mat normals(in_tex.size(), CV_32FC2);
 
     for (int y = 0; y < height; ++y)
     {
         for (int x = 0; x < width; ++x)
         {
             auto p = in_tex.at<cv::Vec3b>(y, x);
-            auto& out = normals.at<cv::Vec3f>(y, x);
+            auto& out = normals.at<cv::Vec2f>(y, x);
             if (p[0] == 255 && p[1] == 255 && p[2] == 255)
             {
                 out[0] = 0;
                 out[1] = 0;
-                out[2] = 1;
+                //out[2] = 1;
             }
             else
             {
-                auto nx = p[2] - 127.5;
-                auto ny = -(p[1] - 127.5);
+                auto nx = -(p[2] - 127.5);
+                auto ny = (p[1] - 127.5);
                 auto nz = p[0] - 127.5;
 
-                auto coeff = 1. / sqrt(sqr(nx) + sqr(ny) + sqr(nz));
-                out[0] = nx * coeff;
-                out[1] = ny * coeff;
-                out[2] = nz * coeff;
+                //auto coeff = 1. / sqrt(sqr(nx) + sqr(ny) + sqr(nz));
+                //out[0] = nx * coeff;
+                //out[1] = ny * coeff;
+                //out[2] = nz * coeff;
+
+                out[0] = nx / nz;
+                out[1] = ny / nz;
             }
         }
     }
