@@ -1,4 +1,6 @@
 # Normal2Height2
-An accompany to https://github.com/V-Sense/DeepNormals
+An accompany to https://github.com/V-Sense/DeepNormals.
 
-Please note also https://github.com/Chaosinism/NormalMapTool
+Please note also https://github.com/Chaosinism/NormalMapTool.
+
+Can be used together with https://github.com/aliakseis/line-filler and https://github.com/aliakseis/DeepNormals-tflite.
