@@ -1,4 +1,7 @@
 # Normal2Height2
+
+Converting a Normal Map to a Height (Displacement) Map
+
 An accompany to https://github.com/V-Sense/DeepNormals.
 
 Please note also https://github.com/Chaosinism/NormalMapTool.
